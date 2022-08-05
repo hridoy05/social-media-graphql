@@ -1,9 +1,10 @@
+import { Post } from '@prisma/client';
 import { Mutation } from './resolvers/Mutation';
 import { ApolloServer , gql} from "apollo-server";
 
 export const typeDefs = gql `
     type Query {
-        hello: String
+        posts: [Post!]!
     }
 
     type Mutation{
