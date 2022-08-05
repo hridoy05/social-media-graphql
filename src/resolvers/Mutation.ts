@@ -1,25 +1,27 @@
-import { Post } from "@prisma/client";
+import { Post, prisma, Prisma } from "@prisma/client";
 import { Context } from "../index";
 
 interface PostCreateArgs {
-  title: string;
-  content: string;
+  post: {
+    title?: string;
+    content?: string;
+  }
 }
 
 interface PostPayloadType {
   userErrors: {
     message: string;
   }[];
-  post: Post | null;
+  post: Post | Prisma.Prisma__PostClient<Post> | null;
 }
 
 export const Mutation = {
   postCreate: async (
     _: any,
-    { title, content }: PostCreateArgs,
+    { post }: PostCreateArgs,
     { prisma }: Context
   ): Promise<PostPayloadType> => {
-
+    const {title, content} = post
     if(!title || ! content){
         return {
             userErrors: [
@@ -31,18 +33,63 @@ export const Mutation = {
         }
     }
 
-    const post = await prisma.post.create({
-      data: {
-        title,
-        content,
-        authorId: 1,
-      },
-    });
     return {
         userErrors: [{
             message: "No errors"
         }],
-        post
+        post: prisma.post.create({
+            data: {
+              title,
+              content,
+              authorId: 1,
+            },
+          })
     }
   },
-};
+  postUpdate: async (_:any, {post,postId}:{postId: string,post:PostCreateArgs['post']}, {prisma}:Context): Promise<PostPayloadType>=> {
+    const {title, content} = post
+    if(!title && !content){
+        return {
+            userErrors: [
+                {
+                    message: "need to have at field to update"
+                }
+            ],
+            post: null
+        }
+    }
+
+    const existingProduct = await prisma.post.findUnique({
+        where: {
+            id: Number(postId)
+        }
+    })
+
+    if(!existingProduct){
+        return {
+            userErrors: [
+                {
+                    message: "Post does not exist"
+                }
+            ],
+            post: null
+        }
+    }
+    let payLoadToUpdate = {
+        title, content
+    }
+    if(!title) delete payLoadToUpdate.title
+    if(!content) delete payLoadToUpdate.content
+    return {
+        userErrors:[],
+        post : prisma.post.update({
+            data: {
+                ...payLoadToUpdate
+            },
+            where:{
+                id: Number(postId)
+            }
+        })
+    }
+  }
+}
