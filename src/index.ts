@@ -1,4 +1,4 @@
-import { Mutation } from './resolvers/Mutation';
+import { Mutation } from './resolvers/Mutation/Mutation';
 import { Query } from './resolvers/index'
 import {ApolloServer, gql} from "apollo-server"
 import {typeDefs} from "./schema"
