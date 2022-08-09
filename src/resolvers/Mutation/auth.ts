@@ -2,6 +2,8 @@ import { prisma } from '@prisma/client';
 import { Context } from "../../index";
 import validator from 'validator'
 import bcrypt from "bcryptjs"
+import JWT from "jsonwebtoken"
+import { JWT_SIGNATURE } from '../../keys';
 interface SignupArgs{
     email: string;
     name: string;
@@ -14,7 +16,7 @@ interface UserPayload{
     userErrors: {
         message: String
     }[];
-    user: null
+    token : String| null
 }
 export const authResolvers = {
     signup: async(_:any, {email, name,password,bio}:SignupArgs,{prisma}:Context): Promise<UserPayload>=> {
@@ -26,7 +28,7 @@ export const authResolvers = {
                 userErrors: [{
                     message: "Invalid email"
                 }],
-                user: null
+                token : null
             }
         }
 
@@ -38,7 +40,7 @@ export const authResolvers = {
                 userErrors: [{
                     message: "Invalid password"
                 }],
-                user: null
+                token : null
             }
         }
 
@@ -49,30 +51,30 @@ export const authResolvers = {
                 userErrors:[
                     {message: "invalid name or bio"}
                 ],
-                user: null
+                token: null
             }
         }
 
         const hashPassword = await bcrypt.hash(password, 10)
 
-        await prisma.user.create({
+        const user = await prisma.user.create({
             data: {
                 email,
                 name,
                 password: hashPassword
             }
         })
+        const token = await JWT.sign({
+            userId: user.id ,
+            email: user.email
+        },JWT_SIGNATURE,{
+            expiresIn: 3600000
+        })
         return {
             userErrors: [],
-            user: null
+            token: token
         }
 
-        // return prisma.user.create({
-        //     data: {
-        //         email,
-        //         name,
-        //         password
-        //     }
-        // })
+        
     }
 }
