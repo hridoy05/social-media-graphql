@@ -1,8 +1,8 @@
-import { Post } from '@prisma/client';
-import { Mutation } from './resolvers/Mutation/Mutation';
-import { ApolloServer , gql} from "apollo-server";
+import { Post } from "@prisma/client";
+import { Mutation } from "./resolvers/Mutation/Mutation";
+import { ApolloServer, gql } from "apollo-server";
 
-export const typeDefs = gql `
+export const typeDefs = gql`
     type Query {
         posts: [Post!]!
     }
@@ -11,7 +11,8 @@ export const typeDefs = gql `
         postCreate(post: PostInput!):  PostPayload!
         postUpdate(postId: ID!,post: PostInput!): PostPayload
         postDelete(postId: ID!): PostPayload
-        signup(email: String!, name: String, password: String!, bio: String!): AuthPayload
+        signup(credentials: CredentialsInput!, bio: String!): AuthPayload!
+        signin(credentials: CredentialsInput!):AuthPayload!
 
     }
 
@@ -50,5 +51,9 @@ export const typeDefs = gql `
         title: String
         content: String
     }
+    input CredentialsInput {
+        email: String!
+        password: String!
+    }
 
-`
+`;
