@@ -31,6 +31,7 @@ interface UserPayload{
 }
 export const authResolvers = {
     signup: async(_:any, {credentials, name,bio}:SignupArgs,{prisma}:Context): Promise<UserPayload>=> {
+        
         const {email, password} = credentials
         const isEmail = validator.isEmail(email)
         if(!isEmail){
@@ -74,6 +75,7 @@ export const authResolvers = {
                 password: hashPassword
             }
         })
+        
         await prisma.profile.create({
             data:{
                 bio,

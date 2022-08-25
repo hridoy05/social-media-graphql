@@ -4,6 +4,7 @@ import { ApolloServer, gql } from "apollo-server";
 
 export const typeDefs = gql`
     type Query {
+        me: User
         posts: [Post!]!
     }
 
@@ -14,7 +15,7 @@ export const typeDefs = gql`
         postPublish(postId: ID!): PostPayload!
         postUnPublish(postId: ID!): PostPayload!
         signup(credentials: 
-        CredentialsInput!, bio: String!): AuthPayload!
+        CredentialsInput!, name: String! bio: String!): AuthPayload!
         signin(credentials: CredentialsInput!):AuthPayload!
 
     }
