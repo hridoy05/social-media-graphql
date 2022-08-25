@@ -6,7 +6,7 @@ interface UserParentType {
 
 
 export const User ={
-    posts: (parent: UserParentType, {userId}: {userId: string}, {prisma, userInfo}: Context)=> {
+    posts: (parent: UserParentType, {take, skip}: {take : number, skip: number}, {prisma, userInfo}: Context)=> {
         const isOwnProfile = parent.id === userInfo?.userId
 
         if(isOwnProfile){
@@ -16,7 +16,9 @@ export const User ={
                 },
                 orderBy: [{
                     createdAt: "desc"
-                }]
+                }],
+                take,
+                skip
             })
         } else {
             return prisma.post.findMany({
@@ -26,7 +28,9 @@ export const User ={
                 },
                 orderBy: [{
                     createdAt: "desc"
-                }]
+                }],
+                take,
+                skip
             })
         }
     }
