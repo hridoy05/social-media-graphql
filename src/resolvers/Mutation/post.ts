@@ -18,9 +18,19 @@ interface PostPayloadType {
 export const postResolvers = {
     postCreate: async (
         _: any,
-        { post }: PostCreateArgs,
-        { prisma }: Context
+        { post}: PostCreateArgs,
+        { prisma , userInfo}: Context
       ): Promise<PostPayloadType> => {
+
+        if(!userInfo){
+          return {
+            userErrors:[{
+              message: "forbidden access aunauthenticated"
+            }],
+            post: null
+          }
+        }
+
         const { title, content } = post;
         if (!title || !content) {
           return {
@@ -43,7 +53,7 @@ export const postResolvers = {
             data: {
               title,
               content,
-              authorId: 1,
+              authorId: userInfo.userId,
             },
           }),
         };
