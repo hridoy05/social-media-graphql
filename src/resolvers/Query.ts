@@ -9,6 +9,14 @@ export const Query = {
         })
 
     },
+
+    profile: (_: any, {userId}: {userId: string}, {prisma}: Context)=> {
+        return prisma.profile.findUnique({
+            where: {
+                userId: Number(userId)
+            }
+        })
+    },
     posts: (_: any, __: any, {prisma}: Context)=> {
         return prisma.post.findMany({
             orderBy:[{
